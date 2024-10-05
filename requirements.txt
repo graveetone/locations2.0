@@ -1,0 +1,4 @@
+uv
+fastapi[standard]
+websockets
+motor
