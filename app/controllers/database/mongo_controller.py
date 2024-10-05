@@ -1,9 +1,12 @@
 from functools import cached_property
 
+from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from app.controllers.database.base import BaseDbController
 
-class MongoController:
+
+class MongoController(BaseDbController):
     def __init__(self, database=None, collection=None):
         self.database = database
         self.collection = collection
@@ -21,5 +24,5 @@ class MongoController:
 
     @cached_property
     def client(self):
-        print("Creating new Mongo client")
-        return AsyncIOMotorClient("localhost", 27017)
+        logger.info("Creating new Mongo connection")
+        return AsyncIOMotorClient(host="localhost", port=27017)
