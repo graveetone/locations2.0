@@ -19,6 +19,7 @@ async def ws_locations(websocket: WebSocket, app_code: AppCode):
             data = await websocket.receive_json()
             action = Action(data.pop("action"))
             log.info(action.name)
+
             response = await controller(logger=log).invoke(action, **data)
             await websocket.send_json(response)
 

@@ -1,10 +1,12 @@
+import loguru
+
 from app.constants import Action
 from app.models.point import Point
 
 
-class BaseAppController:
+class BaseAppController:  # make abc or protocol
     # rewrite to cls methods?
-    def __init__(self, logger):
+    def __init__(self, logger: loguru.logger):
         self.logger = logger
 
     # rewrite to __call__?
