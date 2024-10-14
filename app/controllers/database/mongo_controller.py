@@ -7,12 +7,12 @@ from app.controllers.database.base import BaseDbController
 
 
 class MongoController(BaseDbController):
-    def __init__(self, database=None, collection=None):
+    def __init__(self, database: str | None = None, collection: str | None = None):
         self.database = database
         self.collection = collection
         # TODO: add setters for database and collection
 
-    async def create(self, document):
+    async def create(self, document: dict):
         return await self.client[self.database][self.collection].insert_one(document)
 
     async def find_many(self, **kwargs):

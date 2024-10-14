@@ -29,7 +29,7 @@ class RedisSortedSetAppController(BaseAppController):
 
         return jsonable_encoder(location)
 
-    async def get_last_location(self, resource_id):
+    async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
         locations = await self.CONTROLLER.client.zrevrange(
             self.SET_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
@@ -41,7 +41,7 @@ class RedisSortedSetAppController(BaseAppController):
 
         return jsonable_encoder(Location.parse_raw(locations[0]))
 
-    async def get_locations(self, resource_id):
+    async def get_locations(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
         locations = await self.CONTROLLER.client.zrevrange(
@@ -53,7 +53,7 @@ class RedisSortedSetAppController(BaseAppController):
 
         return jsonable_encoder(parse_obj_as(list[Location], locations))
 
-    async def get_resources_nearby(self, point, radius, time_threshold):
+    async def get_resources_nearby(self, point: dict, radius: float, time_threshold: float):
         self.logger.debug(f"Get resources nearby")
         point = Point(**point)
 

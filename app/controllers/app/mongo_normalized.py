@@ -33,7 +33,7 @@ class MongoNormalizedAppController(BaseAppController):
 
         return jsonable_encoder(Location(**created_location))
 
-    async def get_last_location(self, resource_id):
+    async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
         resource = await self.find_resource(identifier=resource_id)
@@ -44,7 +44,7 @@ class MongoNormalizedAppController(BaseAppController):
             return jsonable_encoder(Location(**locations[0]))
         return {}
 
-    async def get_locations(self, resource_id):
+    async def get_locations(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
         resource = await self.find_resource(identifier=resource_id)
@@ -54,7 +54,7 @@ class MongoNormalizedAppController(BaseAppController):
 
         return jsonable_encoder(parse_obj_as(list[Location], locations))
 
-    async def get_resources_nearby(self, point, radius, time_threshold):
+    async def get_resources_nearby(self, point: dict, radius: float, time_threshold: float):
         self.logger.debug(f"Get resources nearby")
         point = Point(**point)
 
