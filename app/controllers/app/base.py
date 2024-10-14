@@ -1,27 +1,32 @@
+from abc import ABC, abstractmethod
+
 import loguru
 
 from app.constants import Action
-from app.models.point import Point
+from app.models.mongo_normalized import Point, Resource, Location
 
 
-class BaseAppController:  # make abc or protocol
-    # rewrite to cls methods?
+class BaseAppController(ABC):
     def __init__(self, logger: loguru.logger):
         self.logger = logger
 
-    # rewrite to __call__?
-    async def invoke(self, action: Action, **kwargs):
-        self.logger.success("Invocation successful")
+    async def __call__(self, action: Action, **kwargs):
+        self.logger.info(f"Invocation of {self.__class__.__name__}")
         return await getattr(self, action.value)(**kwargs)
 
+
+    @abstractmethod
     async def get_last_location(self, resource_id: int):
-        raise NotImplemented
+        ...
 
+    @abstractmethod
     async def get_locations(self, resource_id: int):
-        raise NotImplemented
+        ...
 
-    async def add_location(self, resource_id: int, point: Point):
-        raise NotImplemented
+    @abstractmethod
+    async def add_location(self, resource_id: int, location: dict):
+        ...
 
-    async def get_resources_nearby(self, point: Point, radius: float, time_threshold: float):
-        raise NotImplemented
+    @abstractmethod
+    async def get_resources_nearby(self, point: dict, radius: float, time_threshold: float):
+        ...

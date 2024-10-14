@@ -10,17 +10,17 @@ logger = get_logger()
 
 @app.websocket("/ws/{app_code}")
 async def ws_locations(websocket: WebSocket, app_code: AppCode):
-    controller = APP_CONTROLLERS[app_code]
     log = logger.bind(app_code=AppCode(app_code).name)
+    controller = APP_CONTROLLERS[app_code](logger=log)
     await websocket.accept()
 
     try:
         while True:
             data = await websocket.receive_json()
             action = Action(data.pop("action"))
-            log.info(action.name)
+            log.info(f"Got action: {action.name}")
 
-            response = await controller(logger=log).invoke(action, **data)
+            response = await controller(action, **data)
             await websocket.send_json(response)
 
     except WebSocketDisconnect:

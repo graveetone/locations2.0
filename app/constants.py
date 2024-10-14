@@ -11,4 +11,5 @@ class Action(Enum):
 class AppCode(Enum):
     MONGO_EMBEDDED: str = "mongo_embedded"
     MONGO_NORMALIZED: str = "mongo_normalized"
-    REDIS_UNKNOWN: str = "redis_unknown"
+    REDIS_OPTIMIZED: str = "redis_optimized"
+    REDIS_SORTED_SET: str = "redis_sorted_set"
