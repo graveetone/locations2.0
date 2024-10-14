@@ -18,12 +18,12 @@ class RedisListAppController(BaseAppController):
 
         location = Location(**location, resource_id=resource_id)
 
-        await self.CONTROLLER.client.lpush(
+        await self.client.lpush(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             location.json()
         )
 
-        await self.CONTROLLER.client.geoadd(
+        await self.client.geoadd(
             self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             (location.point.longitude, location.point.latitude, resource_id)
         )
@@ -33,7 +33,7 @@ class RedisListAppController(BaseAppController):
     async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
-        location = await self.CONTROLLER.client.lindex(
+        location = await self.client.lindex(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0
         )
@@ -43,7 +43,7 @@ class RedisListAppController(BaseAppController):
     async def get_locations(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
-        locations = await self.CONTROLLER.client.lrange(
+        locations = await self.client.lrange(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0, -1
         )
@@ -56,7 +56,7 @@ class RedisListAppController(BaseAppController):
         point = Point(**point)
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
-        nearby_resources_ids = await self.CONTROLLER.client.georadius(
+        nearby_resources_ids = await self.client.georadius(
             self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             point.longitude, point.latitude,
             radius, unit='m'
@@ -65,7 +65,7 @@ class RedisListAppController(BaseAppController):
         # filter by timestamp
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
-            last_resource_location = await self.CONTROLLER.client.lindex(
+            last_resource_location = await self.client.lindex(
                 self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
                 0
             )
