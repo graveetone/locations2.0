@@ -4,12 +4,10 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
 
 from app.controllers.app.base import BaseAppController
-from app.controllers.database.redis_controller import RedisController
 from app.models.mongo_embedded import Location, Point
 
 
 class RedisListAppController(BaseAppController):
-    CONTROLLER = RedisController()
     LIST_PATTERN = "{app_code}::resource::{resource_id}::locations"
     LAST_LOCATION_PATTERN = "{app_code}::last_locations"
 
@@ -18,12 +16,12 @@ class RedisListAppController(BaseAppController):
 
         location = Location(**location, resource_id=resource_id)
 
-        await self.client.lpush(
+        await self.redis_client.lpush(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             location.json()
         )
 
-        await self.client.geoadd(
+        await self.redis_client.geoadd(
             self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             (location.point.longitude, location.point.latitude, resource_id)
         )
@@ -33,7 +31,7 @@ class RedisListAppController(BaseAppController):
     async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
-        location = await self.client.lindex(
+        location = await self.redis_client.lindex(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0
         )
@@ -43,7 +41,7 @@ class RedisListAppController(BaseAppController):
     async def get_locations(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
-        locations = await self.client.lrange(
+        locations = await self.redis_client.lrange(
             self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0, -1
         )
@@ -56,7 +54,7 @@ class RedisListAppController(BaseAppController):
         point = Point(**point)
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
-        nearby_resources_ids = await self.client.georadius(
+        nearby_resources_ids = await self.redis_client.georadius(
             self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             point.longitude, point.latitude,
             radius, unit='m'
@@ -65,7 +63,7 @@ class RedisListAppController(BaseAppController):
         # filter by timestamp
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
-            last_resource_location = await self.client.lindex(
+            last_resource_location = await self.redis_client.lindex(
                 self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
                 0
             )
