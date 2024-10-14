@@ -6,7 +6,7 @@ from loguru import logger
 def get_logger():
     logger_format = (
         "<level>{level}</level>: "
-        "<light-blue>{time:YYYY-MM-DD HH:mm:ss.SSS}</light-blue> | "
+        "<light-blue>{time:YYYY-MM-DD HH:mm:ss.SSS}</light-blue> <yellow>|</yellow> "
         "<cyan>{extra[app_code]}</cyan> | {message}"
     )
 

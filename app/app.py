@@ -25,3 +25,8 @@ async def ws_locations(websocket: WebSocket, app_code: AppCode):
 
     except WebSocketDisconnect:
         log.info("Connection closed")
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "UP"}
