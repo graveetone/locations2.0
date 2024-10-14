@@ -70,8 +70,8 @@ class MongoNormalizedAppController(BaseAppController):
 
         nearby_resources_ids = [location["resource_id"] for location in nearby_locations]
         resources_nearby = await self.database.resource.find({"_id": {"$in": nearby_resources_ids}}).to_list(None)
-
-        return jsonable_encoder(parse_obj_as(list[Resource], resources_nearby))
+        nearby_resources_identifiers = [resource["identifier"] for resource in resources_nearby]
+        return jsonable_encoder(nearby_resources_identifiers)
 
     async def find_resource(self, identifier: int):
         resource = await self.database.resource.find_one({"identifier": identifier})

@@ -63,7 +63,7 @@ class RedisSortedSetAppController(BaseAppController):
             point.longitude, point.latitude,
             radius, unit='m'
         )
-        breakpoint()
+
         # filter by timestamp
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
