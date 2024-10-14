@@ -10,8 +10,8 @@ from app.models.mongo_embedded import Location, Point
 
 class RedisListAppController(BaseAppController):
     CONTROLLER = RedisController()
-    LIST_PATTERN = "resource::{resource_id}::locations"
-    LAST_LOCATION_PATTERN = "last_locations"
+    LIST_PATTERN = "{app_code}::resource::{resource_id}::locations"
+    LAST_LOCATION_PATTERN = "{app_code}::last_locations"
 
     async def add_location(self, resource_id: int, location: dict):
         self.logger.debug(f"Resource {resource_id} | Add location")
@@ -19,12 +19,12 @@ class RedisListAppController(BaseAppController):
         location = Location(**location, resource_id=resource_id)
 
         await self.CONTROLLER.client.lpush(
-            self.LIST_PATTERN.format(resource_id=resource_id),
+            self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             location.json()
         )
 
         await self.CONTROLLER.client.geoadd(
-            self.LAST_LOCATION_PATTERN,
+            self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             (location.point.longitude, location.point.latitude, resource_id)
         )
 
@@ -34,7 +34,7 @@ class RedisListAppController(BaseAppController):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
         location = await self.CONTROLLER.client.lindex(
-            self.LIST_PATTERN.format(resource_id=resource_id),
+            self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0
         )
 
@@ -43,7 +43,10 @@ class RedisListAppController(BaseAppController):
     async def get_locations(self, resource_id):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
-        locations = await self.CONTROLLER.client.lrange(self.LIST_PATTERN.format(resource_id=resource_id), 0, -1)
+        locations = await self.CONTROLLER.client.lrange(
+            self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            0, -1
+        )
         locations = [Location.parse_raw(location) for location in locations]
 
         return jsonable_encoder(parse_obj_as(list[Location], locations))
@@ -54,7 +57,7 @@ class RedisListAppController(BaseAppController):
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
         nearby_resources_ids = await self.CONTROLLER.client.georadius(
-            self.LAST_LOCATION_PATTERN,
+            self.LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             point.longitude, point.latitude,
             radius, unit='m'
         )
@@ -63,7 +66,7 @@ class RedisListAppController(BaseAppController):
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
             last_resource_location = await self.CONTROLLER.client.lindex(
-                self.LIST_PATTERN.format(resource_id=resource_id),
+                self.LIST_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
                 0
             )
             location_timestamp = Location.parse_raw(last_resource_location).timestamp

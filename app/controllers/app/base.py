@@ -2,13 +2,14 @@ from abc import ABC, abstractmethod
 
 import loguru
 
-from app.constants import Action
+from app.constants import Action, AppCode
 from app.models.mongo_normalized import Point, Resource, Location
 
 
 class BaseAppController(ABC):
-    def __init__(self, logger: loguru.logger):
+    def __init__(self, logger: loguru.logger, app_code: AppCode):
         self.logger = logger
+        self.app_code = app_code.value
 
     async def __call__(self, action: Action, **kwargs):
         self.logger.info(f"Invocation of {self.__class__.__name__}")

@@ -11,7 +11,7 @@ logger = get_logger()
 @app.websocket("/ws/{app_code}")
 async def ws_locations(websocket: WebSocket, app_code: AppCode):
     log = logger.bind(app_code=AppCode(app_code).name)
-    controller = APP_CONTROLLERS[app_code](logger=log)
+    controller = APP_CONTROLLERS[app_code](logger=log, app_code=app_code)
     await websocket.accept()
 
     try:
