@@ -8,7 +8,7 @@ from app.controllers.database.redis_controller import RedisController
 from app.models.mongo_embedded import Location, Point
 
 
-class RedisOptimizedAppController(BaseAppController):
+class RedisListAppController(BaseAppController):
     CONTROLLER = RedisController()
     LIST_PATTERN = "resource::{resource_id}::locations"
     LAST_LOCATION_PATTERN = "last_locations"
