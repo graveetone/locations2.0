@@ -4,8 +4,7 @@ import time
 
 import requests
 
-from cli.admin import clear_mongo, clear_redis
-from cli.logger import get_logger
+from utils.logger import get_logger
 from constants import AppCode
 from mappings import ADMIN_CONTROLLERS
 
