@@ -11,7 +11,7 @@ class Point(BaseModel):
 
 class Location(BaseModel):
     point: Point
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    timestamp: float = Field(default_factory=lambda: datetime.now(UTC).timestamp())
     resource_id: int = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True, json_encoders={ObjectId: str, datetime: str})

@@ -41,7 +41,7 @@ class MongoNormalizedAppController(BaseAppController):
         self.logger.debug("Get resources nearby")
         point = Point(**point)
 
-        time_limit = datetime.now(UTC) - timedelta(seconds=time_threshold)
+        time_limit = datetime.now(UTC).timestamp() - time_threshold
         nearby_locations = await self.locations.find(filter={
             "point": {
                 "$geoWithin": {

@@ -15,7 +15,7 @@ class RedisSortedSetAppController(BaseAppController):
 
         await self.redis_client.zadd(
             REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
-            {location.json(): datetime.timestamp(location.timestamp)}
+            {location.json(): location.timestamp}
         )
 
         await self.redis_client.geoadd(
@@ -53,7 +53,7 @@ class RedisSortedSetAppController(BaseAppController):
         self.logger.debug("Get resources nearby")
         point = Point(**point)
 
-        min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
+        time_limit = datetime.now(UTC).timestamp() - time_threshold
         nearby_resources_ids = await self.redis_client.georadius(
             REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code.value),
             point.longitude, point.latitude,
@@ -69,7 +69,7 @@ class RedisSortedSetAppController(BaseAppController):
             )
             location_timestamp = Location.parse_raw(last_resource_location[0]).timestamp
 
-            if location_timestamp >= min_timestamp:
+            if location_timestamp >= time_limit:
                 nearby_resources.add(int(resource_id))
 
         return jsonable_encoder(nearby_resources)

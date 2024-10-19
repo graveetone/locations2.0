@@ -71,7 +71,7 @@ async def main():
             locations_per_resource=10
         )
         # return
-        # continue
+        continue
         server_process = run_server()
         time.sleep(SERVER_START_STOP_TIMEOUT)  # wait for server to start
 

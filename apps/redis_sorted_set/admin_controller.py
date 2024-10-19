@@ -19,7 +19,7 @@ class RedisSortedSetAdminController(BaseAppAdminController):
             random.shuffle(locations)
             await self.redis_client.zadd(
                 REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
-                mapping={location.json(): datetime.timestamp(location.timestamp) for location in locations}
+                mapping={location.json(): location.timestamp for location in locations}
             )
 
             last_location_point = locations[-1].point
