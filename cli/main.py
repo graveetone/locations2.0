@@ -61,7 +61,7 @@ def get_event_loop():
 async def main():
     for app_code in AppCode:
         logger.critical(app_code.name)
-        admin_controller = ADMIN_CONTROLLERS[app_code](logger=logger)
+        admin_controller = ADMIN_CONTROLLERS[app_code](logger=logger, app_code=app_code)
 
         await clear_databases()
 

@@ -15,12 +15,12 @@ class RedisListAppController(BaseAppController):
         location = RedisLocation(**location, resource_id=resource_id)
 
         await self.redis_client.lpush(
-            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
             location.json()
         )
 
         await self.redis_client.geoadd(
-            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code),
+            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code.value),
             (location.point.longitude, location.point.latitude, resource_id)
         )
 
@@ -30,7 +30,7 @@ class RedisListAppController(BaseAppController):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
         location = await self.redis_client.lindex(
-            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
             0
         )
 
@@ -40,7 +40,7 @@ class RedisListAppController(BaseAppController):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
         locations = await self.redis_client.lrange(
-            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
             0, -1
         )
         locations = [RedisLocation.parse_raw(location) for location in locations]
@@ -53,7 +53,7 @@ class RedisListAppController(BaseAppController):
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
         nearby_resources_ids = await self.redis_client.georadius(
-            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code),
+            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code.value),
             point.longitude, point.latitude,
             radius, unit='m'
         )
@@ -62,7 +62,7 @@ class RedisListAppController(BaseAppController):
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
             last_resource_location = await self.redis_client.lindex(
-                REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+                REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code.value),
                 0
             )
             location_timestamp = RedisLocation.parse_raw(last_resource_location).timestamp
