@@ -18,6 +18,9 @@ class BaseAppAdminController(abc.ABC):
     @abc.abstractmethod
     async def seed_database(self, number_of_resources: int, locations_per_resource: int): ...
 
+    @abc.abstractmethod
+    async def reset_database(self): ...
+
     @cached_property
     def mongo_client(self):
         self.logger.info("Creating new Mongo connection")

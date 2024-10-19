@@ -1,3 +1,4 @@
+import asyncio
 import random
 
 from constants import REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
@@ -28,3 +29,8 @@ class RedisListAdminController(BaseAppAdminController):
             )
 
         self.logger.success(f"Seeded {locations_per_resource * number_of_resources} locations")
+
+    async def reset_database(self):
+        keys = self.redis_client.scan_iter(f"{self.app_code.value}*")
+        tasks = [self.redis_client.delete(key) async for key in keys]
+        await asyncio.gather(*tasks)

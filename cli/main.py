@@ -14,13 +14,6 @@ RUN_SERVER_COMMAND = ["fastapi", "run", path_to_app]
 SERVER_START_STOP_TIMEOUT = 2
 
 
-async def clear_databases():
-    # each app should clear its own dbs
-    logger.info("Resetting dbs")
-    await clear_mongo()
-    await clear_redis()
-
-
 def run_server():
     logger.info("Running server")
 
@@ -63,11 +56,12 @@ async def main():
         logger.critical(app_code.name)
         admin_controller = ADMIN_CONTROLLERS[app_code](logger=logger, app_code=app_code)
 
-        await clear_databases()
+        logger.info("Reset database")
+        await admin_controller.reset_database()
 
         logger.info("Seeding db")
         await admin_controller.seed_database(
-            number_of_resources=10,
+            number_of_resources=1000,
             locations_per_resource=10
         )
         # return
