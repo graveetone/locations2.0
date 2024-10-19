@@ -16,3 +16,7 @@ class AppCode(Enum):
 
 
 MONGO_EMBEDDED_APP_DATABASE = "mongo_embedded_db"
+MONGO_NORMALIZED_APP_DATABASE = "mongo_normalized_db"
+
+REDIS_LOCATIONS_PATTERN = "{app_code}::resource::{resource_id}::locations"
+REDIS_LAST_LOCATION_PATTERN = "{app_code}::last_locations"

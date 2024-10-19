@@ -5,9 +5,7 @@ from pydantic import parse_obj_as
 
 from apps.base import BaseAppController
 from apps.redis_sorted_set.models import RedisLocation, Point
-
-SET_PATTERN = "{app_code}::resource::{resource_id}::locations"
-LAST_LOCATION_PATTERN = "{app_code}::last_locations"
+from constants import REDIS_LAST_LOCATION_PATTERN, REDIS_LOCATIONS_PATTERN
 
 
 class RedisSortedSetAppController(BaseAppController):
@@ -16,12 +14,12 @@ class RedisSortedSetAppController(BaseAppController):
         location = RedisLocation(**location, resource_id=resource_id)
 
         await self.redis_client.zadd(
-            SET_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             {location.json(): datetime.timestamp(location.timestamp)}
         )
 
         await self.redis_client.geoadd(
-            LAST_LOCATION_PATTERN.format(app_code=self.app_code),
+            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             (location.point.longitude, location.point.latitude, resource_id)
         )
 
@@ -30,7 +28,7 @@ class RedisSortedSetAppController(BaseAppController):
     async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
         locations = await self.redis_client.zrevrange(
-            SET_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0, 0
         )
 
@@ -43,7 +41,7 @@ class RedisSortedSetAppController(BaseAppController):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
         locations = await self.redis_client.zrevrange(
-            SET_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+            REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
             0, -1
         )
 
@@ -57,7 +55,7 @@ class RedisSortedSetAppController(BaseAppController):
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
         nearby_resources_ids = await self.redis_client.georadius(
-            LAST_LOCATION_PATTERN.format(app_code=self.app_code),
+            REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code),
             point.longitude, point.latitude,
             radius, unit='m'
         )
@@ -66,7 +64,7 @@ class RedisSortedSetAppController(BaseAppController):
         nearby_resources = set()
         for resource_id in nearby_resources_ids:
             last_resource_location = await self.redis_client.zrevrange(
-                SET_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
+                REDIS_LOCATIONS_PATTERN.format(resource_id=resource_id, app_code=self.app_code),
                 0, 0
             )
             location_timestamp = RedisLocation.parse_raw(last_resource_location[0]).timestamp

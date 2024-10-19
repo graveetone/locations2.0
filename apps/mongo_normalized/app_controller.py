@@ -4,19 +4,16 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
 
 from apps.base import BaseAppController
-from apps.mongo_normalized.models import Location, Resource, Point
+from apps.mongo_normalized.models import Location, Point
+from constants import MONGO_NORMALIZED_APP_DATABASE
 from utils.helpers import meters_to_radians
 
-DATABASE = "mongo_normalized_db"
 
 class MongoNormalizedAppController(BaseAppController):
     async def add_location(self, resource_id: int, location: dict):
         self.logger.debug(f"Resource {resource_id} | Add location")
 
-        location = Location(**location)
-        resource = await self.find_resource(identifier=resource_id)
-
-        location.resource_id = resource.mongo_id
+        location = Location(**location, resource_id=resource_id)
 
         result = await self.locations.insert_one(location.model_dump())
         created_location = await self.locations.find_one({"_id": result.inserted_id})
@@ -26,10 +23,8 @@ class MongoNormalizedAppController(BaseAppController):
     async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
 
-        resource = await self.find_resource(identifier=resource_id)
-
         locations = await self.locations.find(
-            {"resource_id": resource.mongo_id}).sort({"timestamp": -1}).limit(1).to_list(None)
+            {"resource_id": resource_id}).sort({"timestamp": -1}).limit(1).to_list(None)
         if locations:
             return jsonable_encoder(Location(**locations[0]))
         return {}
@@ -37,10 +32,8 @@ class MongoNormalizedAppController(BaseAppController):
     async def get_locations(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get locations")
 
-        resource = await self.find_resource(identifier=resource_id)
-
         locations = await self.locations.find(
-            {"resource_id": resource.mongo_id}).sort({"timestamp": 1}).to_list(None)
+            {"resource_id": resource_id}).sort({"timestamp": 1}).to_list(None)
 
         return jsonable_encoder(parse_obj_as(list[Location], locations))
 
@@ -58,19 +51,9 @@ class MongoNormalizedAppController(BaseAppController):
             "timestamp": {"$gte": time_limit}
         }).to_list(None)
 
-        nearby_resources_ids = [location["resource_id"] for location in nearby_locations]
-        resources_nearby = await self.resources.find({"_id": {"$in": nearby_resources_ids}}).to_list(None)
-        nearby_resources_identifiers = [resource["identifier"] for resource in resources_nearby]
-        return jsonable_encoder(nearby_resources_identifiers)
-
-    async def find_resource(self, identifier: int):
-        resource = await self.resources.find_one({"identifier": identifier})
-        return Resource(**resource)
+        nearby_resources_ids = {location["resource_id"] for location in nearby_locations}
+        return jsonable_encoder(nearby_resources_ids)
 
     @property
     def locations(self):
-        return self.mongo_client[DATABASE].location
-
-    @property
-    def resources(self):
-        return self.mongo_client[DATABASE].resource
+        return self.mongo_client[MONGO_NORMALIZED_APP_DATABASE].location
