@@ -1,0 +1,2 @@
+from apps.redis_list.app_controller import RedisListAppController
+from apps.redis_list.admin_controller import RedisListAdminController

@@ -6,8 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from redis.asyncio import Redis
 
 
-from app.constants import Action, AppCode
-from app.models.mongo_normalized import Point, Resource, Location
+from constants import Action, AppCode
 
 
 class BaseAppController(ABC):

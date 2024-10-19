@@ -3,17 +3,13 @@ from datetime import datetime, timedelta, UTC
 from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
 
-from app.controllers.app.base import BaseAppController
-from app.models.mongo_normalized import Location, Resource, Point
+from apps.base import BaseAppController
+from apps.mongo_normalized.models import Location, Resource, Point
+from utils.helpers import meters_to_radians
 
-
-def meters_to_radians(radius: float):
-    return radius * 1000 / 6378.1  # radius in km divided by radius of Earth
-
+DATABASE = "mongo_normalized_db"
 
 class MongoNormalizedAppController(BaseAppController):
-    DB = "mongo_normalized_db"
-
     async def add_location(self, resource_id: int, location: dict):
         self.logger.debug(f"Resource {resource_id} | Add location")
 
@@ -73,8 +69,8 @@ class MongoNormalizedAppController(BaseAppController):
 
     @property
     def locations(self):
-        return self.mongo_client[self.DB].location
+        return self.mongo_client[DATABASE].location
 
     @property
     def resources(self):
-        return self.mongo_client[self.DB].resource
+        return self.mongo_client[DATABASE].resource

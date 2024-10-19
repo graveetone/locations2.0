@@ -1,0 +1,2 @@
+from apps.mongo_normalized.app_controller import MongoNormalizedAppController
+from apps.mongo_normalized.admin_controller import MongoNormalizedAdminController

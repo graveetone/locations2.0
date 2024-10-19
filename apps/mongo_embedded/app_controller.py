@@ -3,26 +3,29 @@ from datetime import datetime, timedelta, UTC
 from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
 
-from app.controllers.app.base import BaseAppController
-from app.models.mongo_embedded import Location, Point
+from apps.base import BaseAppController
+from apps.mongo_embedded.models import Location, Point
+from utils.helpers import meters_to_radians
 
-
-def meters_to_radians(radius: float):
-    return radius * 1000 / 6378.1  # radius in km divided by radius of Earth
+DATABASE = "mongo_embedded_db"
 
 
 class MongoEmbeddedAppController(BaseAppController):
-    DB = "mongo_embedded_db"
-
     async def add_location(self, resource_id: int, location: dict):
         self.logger.debug(f"Resource {resource_id} | Add location")
 
         location = Location(**location, resource_id=resource_id)
-
-        result = await self.locations.insert_one(location.model_dump())
-        created_location = await self.locations.find_one({"_id": result.inserted_id})
-
-        return jsonable_encoder(Location(**created_location))
+        self.resource_collection.updateOne(
+            {
+                "resource_id": resource_id
+            },
+            {
+                "$push": {
+                    "locations": location.model_dump()
+                }
+            }
+        )
+        return jsonable_encoder(location)
 
     async def get_last_location(self, resource_id: int):
         self.logger.debug(f"Resource {resource_id} | Get last location")
@@ -62,4 +65,9 @@ class MongoEmbeddedAppController(BaseAppController):
 
     @property
     def locations(self):
-        return self.mongo_client[self.DB].location
+        return self.mongo_client[DATABASE].location
+
+    @property
+    def resource_collection(self):
+        return self.mongo_client[DATABASE].resource
+

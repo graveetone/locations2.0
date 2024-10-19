@@ -1,8 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-from app.constants import Action, AppCode
-from app.controllers.app.mapping import APP_CONTROLLERS
-from app.utils.logger import get_logger
+from constants import Action, AppCode
+from mappings import APP_CONTROLLERS
+from utils.logger import get_logger
 
 app = FastAPI()
 logger = get_logger()

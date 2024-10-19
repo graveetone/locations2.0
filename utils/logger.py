@@ -1,6 +1,6 @@
 import sys
 
-from loguru import logger
+from loguru import logger as _logger
 
 
 def get_logger():
@@ -10,8 +10,8 @@ def get_logger():
         "<cyan>{extra[app_code]}</cyan> | {message}"
     )
 
-    logger.remove()
-    logger.configure(extra={"app_code": ""})
-    logger.add(sys.stderr, format=logger_format)
+    _logger.remove()
+    _logger.configure(extra={"app_code": ""})
+    _logger.add(sys.stderr, format=logger_format)
 
-    return logger
+    return _logger
