@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
 
 from apps.base import BaseAppController
-from apps.redis_list.models import Point, RedisLocation
+from apps.redis_list.models import RedisPoint, RedisLocation
 from constants import REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
 
 
@@ -48,8 +48,8 @@ class RedisListAppController(BaseAppController):
         return jsonable_encoder(parse_obj_as(list[RedisLocation], locations))
 
     async def get_resources_nearby(self, point: dict, radius: float, time_threshold: float):
-        self.logger.debug(f"Get resources nearby")
-        point = Point(**point)
+        self.logger.debug("Get resources nearby")
+        point = RedisPoint(**point)
 
         min_timestamp = datetime.now(UTC) - timedelta(seconds=time_threshold)
         nearby_resources_ids = await self.redis_client.georadius(

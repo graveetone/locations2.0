@@ -38,7 +38,7 @@ class MongoNormalizedAppController(BaseAppController):
         return jsonable_encoder(parse_obj_as(list[Location], locations))
 
     async def get_resources_nearby(self, point: dict, radius: float, time_threshold: float):
-        self.logger.debug(f"Get resources nearby")
+        self.logger.debug("Get resources nearby")
         point = Point(**point)
 
         time_limit = datetime.now(UTC) - timedelta(seconds=time_threshold)

@@ -1,6 +1,6 @@
 import random
 
-from constants import AppCode, REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
+from constants import REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
 from apps.base import BaseAppAdminController
 from utils.helpers import generate_random_coordinates
 from apps.redis_list.models import RedisLocation
