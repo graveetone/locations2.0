@@ -4,13 +4,13 @@ from bson import ObjectId
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class RedisPoint(BaseModel):
+class Point(BaseModel):
     latitude: float = Field(None, ge=-85, le=85)
     longitude: float = Field(None, ge=-180, le=180)
 
 
-class RedisLocation(BaseModel):
-    point: RedisPoint
+class Location(BaseModel):
+    point: Point
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     resource_id: int = None
 

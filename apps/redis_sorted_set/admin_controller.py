@@ -4,14 +4,14 @@ from datetime import datetime
 from constants import REDIS_LAST_LOCATION_PATTERN, REDIS_LOCATIONS_PATTERN
 from apps.base import BaseAppAdminController
 from utils.helpers import generate_random_coordinates
-from apps.redis_sorted_set.models import RedisLocation
+from apps.redis_sorted_set.models import Location
 
 
 class RedisSortedSetAdminController(BaseAppAdminController):
     async def seed_database(self, number_of_resources: int, locations_per_resource: int):
         for resource_id in range(1, number_of_resources + 1):
             locations = [
-                RedisLocation(
+                Location(
                     point=generate_random_coordinates(),
                     resource_id=resource_id
                 ) for _ in range(locations_per_resource)
