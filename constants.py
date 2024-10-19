@@ -13,3 +13,6 @@ class AppCode(Enum):
     MONGO_NORMALIZED: str = "mongo_normalized"
     REDIS_LIST: str = "redis_list"
     REDIS_SORTED_SET: str = "redis_sorted_set"
+
+
+MONGO_EMBEDDED_APP_DATABASE = "mongo_embedded_db"
