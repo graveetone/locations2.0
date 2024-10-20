@@ -1,4 +1,3 @@
-import asyncio
 import random
 
 from constants import REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
