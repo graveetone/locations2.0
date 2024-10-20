@@ -29,5 +29,6 @@ class MongoNormalizedAdminController(BaseAppAdminController):
         self.logger.success(f"Seeded {len(all_locations)} locations")
 
     async def reset_database(self):
-        self.mongo_client.drop_database(MONGO_NORMALIZED_APP_DATABASE)
+        """Drop and recreate database"""
+        await self.mongo_client.drop_database(MONGO_NORMALIZED_APP_DATABASE)
         self.mongo_client[MONGO_NORMALIZED_APP_DATABASE]

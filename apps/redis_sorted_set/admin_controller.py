@@ -1,6 +1,4 @@
-import asyncio
 import random
-from datetime import datetime
 
 from constants import REDIS_LAST_LOCATION_PATTERN, REDIS_LOCATIONS_PATTERN
 from apps.base import BaseAppAdminController
@@ -33,5 +31,5 @@ class RedisSortedSetAdminController(BaseAppAdminController):
 
     async def reset_database(self):
         keys = self.redis_client.scan_iter(f"{self.app_code.value}*")
-        tasks = [self.redis_client.delete(key) async for key in keys]
-        await asyncio.gather(*tasks)
+        async for key in keys:
+            await self.redis_client.delete(key)

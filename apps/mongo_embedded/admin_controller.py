@@ -32,5 +32,6 @@ class MongoEmbeddedAdminController(BaseAppAdminController):
         self.logger.success(f"Seeded {locations_per_resource * number_of_resources} locations")
 
     async def reset_database(self):
-        self.mongo_client.drop_database(MONGO_EMBEDDED_APP_DATABASE)
+        """Drop and recreate database"""
+        await self.mongo_client.drop_database(MONGO_EMBEDDED_APP_DATABASE)
         self.mongo_client[MONGO_EMBEDDED_APP_DATABASE]

@@ -2,9 +2,9 @@ from enum import Enum
 
 
 class Action(Enum):
+    ADD_LOCATION: str = "add_location"
     GET_LAST_LOCATION: str = "get_last_location"
     GET_LOCATIONS: str = "get_locations"
-    ADD_LOCATION: str = "add_location"
     GET_RESOURCES_NEARBY: str = "get_resources_nearby"
 
 

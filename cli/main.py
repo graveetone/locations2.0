@@ -1,13 +1,18 @@
 from cli.helpers import run_server, run_test_plans, parse_reports, send_metrics_to_datadog, shutdown_server, \
     get_event_loop
+from utils.helpers import get_mongo_client, get_redis_client
 from utils.logger import get_logger
 from constants import AppCode, Action
 from mappings import ADMIN_CONTROLLERS
 
-mongo_client = AsyncIOMotorClient(**MONGO_CONFIG)
-redis_client = Redis(**REDIS_CONFIG)
 
 async def main():
+    logger.info("Running server")
+    server_process = run_server()
+
+    mongo_client = get_mongo_client()
+    redis_client = get_redis_client()
+
     for app_code in AppCode:
         logger.critical(app_code.name)
         admin_controller = ADMIN_CONTROLLERS[app_code](logger=logger, app_code=app_code)
@@ -23,18 +28,21 @@ async def main():
             number_of_resources=1000,
             locations_per_resource=10
         )
-        # return
-        continue
-        server_process = run_server()
-        time.sleep(SERVER_START_STOP_TIMEOUT)  # wait for server to start
 
-        run_test_plans()
+        for action in Action:
+            logger.info(f"Running test plan for {action.name}")
+            run_test_plans(app_code=app_code, action=action)
 
-        parse_reports()
+            logger.info("Parsing csv reports")
+            parse_reports()
 
-        send_metrics_to_datadog()
+            logger.info("Sending metrics to Datadog")
+            send_metrics_to_datadog()
 
-        shutdown_server(server_process=server_process)
+    logger.info("Shutting server down and closing db connections")
+    shutdown_server(server_process=server_process)
+    mongo_client.close()
+    await redis_client.aclose()
 
 
 if __name__ == "__main__":

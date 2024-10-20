@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
 
 import loguru
-
+from motor.motor_asyncio import AsyncIOMotorClient
+from redis.asyncio import Redis
 
 from constants import Action, AppCode
 
 
 class BaseAppController(ABC):
+    mongo_client: AsyncIOMotorClient
+    redis_client: Redis
+
     def __init__(self, logger: loguru.logger, app_code: AppCode):
         self.logger = logger
         self.app_code = app_code

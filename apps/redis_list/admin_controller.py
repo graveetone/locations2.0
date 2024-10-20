@@ -32,5 +32,5 @@ class RedisListAdminController(BaseAppAdminController):
 
     async def reset_database(self):
         keys = self.redis_client.scan_iter(f"{self.app_code.value}*")
-        tasks = [self.redis_client.delete(key) async for key in keys]
-        await asyncio.gather(*tasks)
+        async for key in keys:
+            await self.redis_client.delete(key)
