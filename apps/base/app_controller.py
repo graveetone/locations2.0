@@ -1,9 +1,6 @@
 from abc import ABC, abstractmethod
-from functools import cached_property
 
 import loguru
-from motor.motor_asyncio import AsyncIOMotorClient
-from redis.asyncio import Redis
 
 
 from constants import Action, AppCode
@@ -17,16 +14,6 @@ class BaseAppController(ABC):
     async def __call__(self, action: Action, **kwargs):
         self.logger.info(f"Invocation of {self.__class__.__name__}")
         return await getattr(self, action.value)(**kwargs)
-
-    @cached_property
-    def mongo_client(self):
-        self.logger.info("Creating new Mongo connection")
-        return AsyncIOMotorClient(host="localhost", port=27017)
-
-    @cached_property
-    def redis_client(self):
-        self.logger.info("Creating new Redis connection")
-        return Redis(host="localhost", port=6379, decode_responses=True)
 
     @abstractmethod
     async def get_last_location(self, resource_id: int): ...

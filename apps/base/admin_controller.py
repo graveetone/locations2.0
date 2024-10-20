@@ -1,9 +1,6 @@
 import abc
-from functools import cached_property
 
 import loguru
-from motor.motor_asyncio import AsyncIOMotorClient
-from redis.asyncio import Redis
 
 from constants import AppCode
 
@@ -20,13 +17,3 @@ class BaseAppAdminController(abc.ABC):
 
     @abc.abstractmethod
     async def reset_database(self): ...
-
-    @cached_property
-    def mongo_client(self):
-        self.logger.info("Creating new Mongo connection")
-        return AsyncIOMotorClient(host="localhost", port=27017)
-
-    @cached_property
-    def redis_client(self):
-        self.logger.info("Creating new Redis connection")
-        return Redis(host="localhost", port=6379, decode_responses=True)
