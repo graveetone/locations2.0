@@ -3,3 +3,4 @@ fastapi[standard]
 websockets
 motor
 loguru
+datadog-api-client
