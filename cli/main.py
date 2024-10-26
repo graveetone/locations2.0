@@ -1,3 +1,5 @@
+import time
+
 from cli.helpers import run_server, run_test_plans, parse_reports, send_metrics_to_datadog, shutdown_server, \
     get_event_loop
 from config import SEED_PARAMETERS
@@ -8,6 +10,7 @@ from mappings import ADMIN_CONTROLLERS
 
 
 async def main():
+    started_at = time.time()
     logger.info("Running server")
     server_process = run_server()
 
@@ -44,6 +47,8 @@ async def main():
     shutdown_server(server_process=server_process)
     mongo_client.close()
     await redis_client.aclose()
+
+    logger.success(f"\nPipeline finished. Time spent: {time.time() - started_at} seconds")
 
 
 if __name__ == "__main__":
