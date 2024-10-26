@@ -17,3 +17,7 @@ MONGO_CONFIG = {
     "host": "localhost",
     "port": 27017
 }
+
+SEED_PARAMETERS = [
+    {"number_of_resources": 10, "locations_per_resource": 10},
+]

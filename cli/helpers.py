@@ -17,8 +17,9 @@ def run_server():
     return server_process
 
 
-def run_test_plans(app_code: AppCode, action: Action):
-    output_file = PATH_TO_JMETER_REPORTS / app_code.value / f"{action.value}.csv"
+def run_test_plans(app_code: AppCode, action: Action, seed_param: dict):
+    resources, locations = seed_param["number_of_resources"], seed_param["locations_per_resource"],
+    output_file = PATH_TO_JMETER_REPORTS / app_code.value / f"{resources}_{locations}" / f"{action.value}.csv"
     request_payload = json.dumps({
         **ACTIONS_PAYLOADS_MAPPING[action],
         "action": action.value
