@@ -1,7 +1,7 @@
 import time
 
-from cli.helpers import run_server, run_test_plans, parse_reports, send_metrics_to_datadog, shutdown_server, \
-    get_event_loop
+from cli.helpers import run_server, run_test_plans, parse_report, send_metrics_to_datadog, shutdown_server, \
+    get_event_loop, rotate_reports
 from config import SEED_PARAMETERS
 from utils.helpers import get_mongo_client, get_redis_client
 from utils.logger import get_logger
@@ -11,6 +11,9 @@ from mappings import ADMIN_CONTROLLERS
 
 async def main():
     started_at = time.time()
+    logger.info("Rotating reports")
+    rotate_reports()
+
     logger.info("Running server")
     server_process = run_server()
 
@@ -38,17 +41,17 @@ async def main():
                 run_test_plans(app_code=app_code, action=action, seed_param=seed_param)
 
                 logger.info("Parsing csv reports")
-                parse_reports()
+                report_data = parse_report(app_code=app_code, action=action, seed_param=seed_param)
 
                 logger.info("Sending metrics to Datadog")
-                send_metrics_to_datadog()
+                send_metrics_to_datadog(report_data=report_data)
 
     logger.info("Shutting server down and closing db connections")
     shutdown_server(server_process=server_process)
     mongo_client.close()
     await redis_client.aclose()
 
-    logger.success(f"\nPipeline finished. Time spent: {time.time() - started_at} seconds")
+    logger.success(f"Pipeline finished. Time spent: {time.time() - started_at} seconds")
 
 
 if __name__ == "__main__":

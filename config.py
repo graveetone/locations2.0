@@ -19,5 +19,10 @@ MONGO_CONFIG = {
 }
 
 SEED_PARAMETERS = [
-    {"number_of_resources": 10, "locations_per_resource": 10},
+    {"number_of_resources": 3, "locations_per_resource": 5},
+    {"number_of_resources": 5, "locations_per_resource": 10},
 ]
+
+DD_API_KEY = ""
+DD_APP_KEY = ""
+DD_HOST = "https://app.datadoghq.eu/"

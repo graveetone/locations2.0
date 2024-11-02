@@ -4,3 +4,4 @@ websockets
 motor
 loguru
 datadog-api-client
+pandas
