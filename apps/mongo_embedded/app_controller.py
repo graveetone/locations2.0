@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, UTC
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import parse_obj_as
