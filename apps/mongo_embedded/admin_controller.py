@@ -6,7 +6,7 @@ from pydantic import parse_obj_as
 from apps.base import BaseAppAdminController
 from apps.mongo_embedded.models import Location
 from constants import MONGO_EMBEDDED_APP_DATABASE
-from utils.helpers import generate_random_coordinates
+from utils.helpers import generate_random_coordinates, print_progress_bar
 
 
 class MongoEmbeddedAdminController(BaseAppAdminController):
@@ -25,6 +25,7 @@ class MongoEmbeddedAdminController(BaseAppAdminController):
                 "resource_id": resource_id,
                 "locations": locations
             })
+            print_progress_bar(iteration=resource_id, total=number_of_resources)
 
         random.shuffle(resources)
         await self.mongo_client[MONGO_EMBEDDED_APP_DATABASE].resource.insert_many(resources)

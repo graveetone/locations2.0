@@ -2,7 +2,7 @@ import random
 
 from constants import REDIS_LOCATIONS_PATTERN, REDIS_LAST_LOCATION_PATTERN
 from apps.base import BaseAppAdminController
-from utils.helpers import generate_random_coordinates
+from utils.helpers import generate_random_coordinates, print_progress_bar
 from apps.redis_list.models import Location
 
 
@@ -26,6 +26,7 @@ class RedisListAdminController(BaseAppAdminController):
                 REDIS_LAST_LOCATION_PATTERN.format(app_code=self.app_code.value),
                 (last_location_point.longitude, last_location_point.latitude, resource_id)
             )
+            print_progress_bar(iteration=resource_id, total=number_of_resources)
 
         self.logger.success(f"Seeded {locations_per_resource * number_of_resources} locations")
 
