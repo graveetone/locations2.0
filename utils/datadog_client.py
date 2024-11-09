@@ -1,4 +1,3 @@
-import random
 from datetime import datetime
 from functools import cached_property
 
@@ -56,52 +55,3 @@ class DatadogClient:
                 "appKeyAuth": DD_APP_KEY,
             }
         )
-
-
-apps = ["mongo_normalized", "mongo_embedded", "redis_sorted_set", "redis_list"]
-actions = ["get_locations", "get_last_location", "add_location", "find_resources_nearby"]
-seeds = [10, 100, 1000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000]
-
-if __name__ == "__main__":
-    # while True:
-    #         pair_id = str(uuid.uuid4())[:8]
-    #         metric1 = {
-    #             "name": "test.one",
-    #             "value": random.uniform(0, 100),
-    #             "tags": [f"pair_id:{pair_id}"],
-    #             "type": MetricIntakeType.GAUGE
-    #         }
-    #         response = DatadogClient(metric_data=metric1).send_metric()
-    #         print(response)
-    #
-    #         metric2 = {
-    #             "name": "test.two",
-    #             "value": random.uniform(0, 100),
-    #             "tags": [f"pair_id:{pair_id}"],
-    #             "type": MetricIntakeType.GAUGE
-    #         }
-    #         response = DatadogClient(metric_data=metric2).send_metric()
-    #         print(response)
-    #         time.sleep(10)
-
-    for seed in seeds:
-        for app in apps:
-            for action in actions:
-                pair_id = f"{app}-{seed}-{action}"
-                metric = {
-                    "name": "jmeter.successful_requests",
-                    "value": random.uniform(0, 100),
-                    "tags": [f"app:{app}", f"action:{action}", f"seed:{seed}", f"pair_id:{pair_id}"],
-                    "type": MetricIntakeType.GAUGE
-                }
-                response = DatadogClient(metric_data=metric).send_metric()
-                print(f"{app}-{action}-{seed}: {response}")
-
-                metric = {
-                    "name": "app.seed",
-                    "value": seed,
-                    "tags": [f"pair_id:{pair_id}"],
-                    "type": MetricIntakeType.GAUGE
-                }
-                response = DatadogClient(metric_data=metric).send_metric()
-                print(f"{app}-{action}-{seed}: {response}")
