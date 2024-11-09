@@ -56,8 +56,5 @@ async def main():
 
 if __name__ == "__main__":
     logger = get_logger(identifier="CLI")
-    logger.info("Running pipeline with parameters: {parameters}")
-
     loop = get_event_loop()
-
     loop.run_until_complete(main())
