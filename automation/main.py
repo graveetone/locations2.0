@@ -1,6 +1,6 @@
 import time
 
-from cli.helpers import run_server, run_test_plans, parse_report, send_metrics_to_datadog, shutdown_server, \
+from automation.helpers import run_server, run_test_plans, parse_report, send_metrics_to_datadog, shutdown_server, \
     get_event_loop, rotate_reports
 from config import SEED_PARAMETERS
 from utils.helpers import get_mongo_client, get_redis_client
