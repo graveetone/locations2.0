@@ -5,3 +5,4 @@ motor
 loguru
 datadog-api-client
 pandas
+python-dotenv
